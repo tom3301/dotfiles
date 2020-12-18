@@ -1,0 +1,140 @@
+* Header
+  #+PROPERTY: header-args :tangle "~/.emacs.d/init.el" 
+  
+* General Settings
+** Menu bar disable
+  #+BEGIN_SRC emacs-lisp :tangle ~/.emacs.d/init.el
+  (setq inhibit-startup-message t)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1)
+  (set-fringe-mode 10)
+  (set-frame-font "Inconsolata 14" nil t)
+  
+  (menu-bar-mode -1)
+  (load-theme 'doom-gruvbox t)
+  (column-number-mode)
+  
+  (global-display-line-numbers-mode t)
+  #+END_SRC
+** Initialize usepackage
+   #+begin_src emacs-lisp
+   (require 'package)
+   
+   (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+   ("org" . "https://orgmode.org/elpa/")
+   ("elpa" . "https://elpa.gnu.org/packages/")))
+   
+   (package-initialize)
+   (unless package-archive-contents
+   (package-refresh-contents))
+   
+   ;; Initialize use-package on non-Linux platforms
+   (unless (package-installed-p 'use-package)
+   (package-install 'use-package))
+   
+   (require 'use-package)
+   (setq use-package-always-ensure t)
+   #+end_src
+** Vim keybindings
+   #+begin_src emacs-lisp
+   (use-package evil
+   :init
+   (setq evil-want-integration t)
+   (setq evil-want-keybinding nil)
+   (setq evil-want-C-u-scroll t)
+   (setq evil-want-C-i-jump nil)
+   :config
+   (evil-mode 1)
+   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+   
+   ;; Use visual line motions even outside of visual-line-mode buffers
+   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+   
+   (evil-set-initial-state 'messages-buffer-mode 'normal)
+   (evil-set-initial-state 'dashboard-mode 'normal))
+   (use-package undo-tree)
+   (use-package org
+   :ensure t)
+   
+   (evil-set-undo-system 'undo-tree)
+   (global-undo-tree-mode)
+   #+end_src
+** Themes
+   #+begin_src emacs-lisp
+   (use-package doom-themes)
+   ;;nice balk at bottom
+   (use-package doom-modeline
+   :ensure t
+   :init (doom-modeline-mode 1))
+   (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(custom-safe-themes
+   '("d6603a129c32b716b3d3541fc0b6bfe83d0e07f1954ee64517aa62c9405a3441" default))
+   '(package-selected-packages
+   '(undo-tree undo-redo evil-collection yasnippet latex-preview-pane counsel ivy-rich doom-modeline use-package ivy evil-leader command-log-mode)))
+   (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
+   #+end_src
+** Ivy
+   Ivy is the bottom thing that pops up wne M-x is pressed
+   #+begin_src emacs-lisp
+   (use-package ivy
+   :diminish
+   :config
+   (ivy-mode 1))
+   
+   (use-package ivy-rich
+   :init
+   (ivy-rich-mode 1))
+   (use-package counsel
+   :bind ("M-x" . counsel-M-x))
+   #+end_src
+** Which-key
+   #+begin_src emacs-lisp
+   (use-package which-key
+   :init(which-key-mode)
+   :diminish which-key-mode
+   :config
+   (setq which-key-idle-delay 1))
+   #+end_src
+
+* LaTeX settings
+** Preview 
+   #+begin_src emacs-lisp
+   (use-package latex-preview-pane)
+   #+end_src
+* Snippets
+  Use yasnippet
+  #+begin_src emacs-lisp
+  (use-package yasnippet)
+  (yas-global-mode 1)
+   #+end_src
+* Org Babel
+  Make sure <s TAB works
+  #+begin_src emacs-lisp
+  (require 'org-tempo)
+  #+end_src
+** Python
+  #+begin_src emacs-lisp
+  (org-babel-do-load-languages
+  'org-babel-load-languages
+  '((python . t)))
+  #+end_src
+* Org mode settings
+  #+begin_src emacs-lisp
+  (use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+  #+end_src
